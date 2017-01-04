@@ -1,3 +1,11 @@
+Code modified from https://github.com/cataliniacob/calibre-recipes.
+
+Changes from original:
+
+  - Added 2017 question
+  - Added multiple OS support
+  - Generated books to download
+
 Recipes for Calibre (http://calibre-ebook.com/).
 
 For the Edge.org annual question the recipes are generated automatically from
