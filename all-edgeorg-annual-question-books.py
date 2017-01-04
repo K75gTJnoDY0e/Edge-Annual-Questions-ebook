@@ -8,6 +8,16 @@ import os
 import subprocess
 import string
 import threading
+import platform
+
+plat = platform.system()
+if plat == 'Linux':
+    EBOOK_CONVERT_PATH = 'ebook-convert'
+elif plat == 'Darwin':
+    EBOOK_CONVERT_PATH = '/Applications/calibre.app/Contents/MacOS/ebook-convert'
+else:
+    raise Exception('OS not supported.')
+
 
 common_toc_xpath1 = '//*[contains(concat(" ", @class, " "), " response-title ")]/h:span'
 common_toc_xpath2 = '//*[contains(concat(" ", @class, " "), " response ")]//*/h:div[@class="field-content"]/h:p[1]'
@@ -113,6 +123,11 @@ data = (
      'http://edge.org/responses/what-do-you-consider-the-most-interesting-recent-scientific-news-what-makes-it',
      common_toc_xpath1
      ),
+     ('2017',
+     'What scientific term or concept ought to be more widely known?',
+     'http://edge.org/responses/what-scientific-term-or%C2%A0concept-ought-to-be-more-widely-known',
+     common_toc_xpath1
+     ),
     )
 
 def group_by_n(iterable, n):
@@ -133,13 +148,18 @@ def create_book(year, title, url, toc_xpath):
     with open(out_recipe, 'w') as out_f:
         out_f.write(transformed_recipe)
 
-    subprocess.check_call(['ebook-convert', out_recipe, 'Edge{}.epub'.format(year)])
+    subprocess.check_call([EBOOK_CONVERT_PATH, out_recipe, 'books/Edge{}.epub'.format(year)])
 
     os.remove(out_recipe)
 
 if __name__ == '__main__':
     num_parallel_creations = multiprocessing.cpu_count()
     print('Doing creations in groups of {}'.format(num_parallel_creations))
+
+    try:
+        os.mkdir('books')
+    except:
+        pass
 
     threads = []
     for year, title, url, toc_xpath in data[::-1]:
